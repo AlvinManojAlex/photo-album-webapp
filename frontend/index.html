@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Photo App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo App - Professional Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS for the Professional, Sleek Theme */
+
+        :root {
+            /* Modern Color Palette */
+            --background-dark: #121212; /* Deep background */
+            --card-dark: #1e1e1e;       /* Container background */
+            --text-light: #e0e0e0;      /* Main text color */
+            --accent-blue: #007bff;     /* Primary action color */
+            --border-grey: #333333;     /* Subtle borders/lines */
+            --hover-light: #2c2c2c;     /* Subtle hover for cards */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            margin: 40px 0;
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-grey);
+        }
+
+        /* --- Header/Title Styling --- */
+        h1 {
+            font-weight: 700;
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--text-light);
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: var(--accent-blue);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* --- Section Styling (Search and Upload) --- */
+        .section-card {
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            background-color: #1a1a1a;
+            border: 1px solid var(--border-grey);
+            transition: background-color 0.3s ease;
+        }
+
+        .section-card:hover {
+             background-color: var(--hover-light);
+        }
+
+        h2 {
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 10px;
+        }
+        
+        /* --- Layout Containers for Flexbox --- */
+        .search-input-group {
+            display: flex;
+            gap: 15px; 
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-fields-group {
+            display: flex;
+            gap: 15px; 
+            align-items: center;
+            flex-wrap: wrap; 
+        }
+
+        /* --- Form Element Styling (Input) --- */
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-grey);
+            background-color: #2a2a2a;
+            color: var(--text-light);
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="file"]:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        input::placeholder {
+            color: #888;
+            font-weight: 300;
+        }
+        
+        /* Input Sizing Adjustments for Flex Layout */
+        .search-input-group input[type="text"] {
+            flex-grow: 1; 
+            margin-bottom: 0; 
+        }
+
+        .upload-fields-group input[type="file"] {
+            flex-basis: 250px; 
+            margin-bottom: 0;
+        }
+
+        .upload-fields-group input[type="text"] {
+            flex-grow: 1; 
+            min-width: 150px; 
+            margin-bottom: 0;
+        }
+        
+        /* --- Button Styling --- */
+        button {
+            background-color: var(--accent-blue);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 5px;
+            transition: background-color 0.3s ease, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #0056b3; 
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .upload-fields-group button {
+            margin-top: 0; /* Align button nicely in flex container */
+        }
+
+        /* --- Image Display Control --- */
+        #searchResults {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px; 
+            padding: 15px;
+            border-color: var(--border-grey);
+            background-color: #000000;
+        }
+
+        .image-result-wrapper {
+            width: 200px; 
+            height: 200px;
+            overflow: hidden; 
+            border-radius: 4px;
+            border: 1px solid var(--border-grey);
+            background-color: var(--background-dark);
+        }
+
+        .search-result-image {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover; 
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .search-result-image:hover {
+            transform: scale(1.05); 
+        }
+
+        .no-results-msg, .error-msg {
+            padding: 10px;
+            font-style: italic;
+            color: #888;
+        }
+
+        /* --- Status/Results Styling --- */
+        #uploadStatus {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 20px;
+            background-color: #000000;
+            border: 1px solid var(--border-grey);
+            color: var(--text-light);
+            font-size: 0.9em;
+            font-weight: 300;
+        }
+
+        /* --- Separator Styling --- */
+        hr {
+            border: none;
+            height: 1px;
+            background-color: var(--border-grey);
+            margin: 30px 0;
+            width: 100%;
+        }
+
+    </style>
+	
+    <script type="text/javascript" src="apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/crypto-js.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.879.0.min.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+	<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Photo App</h1>
+
+        <div class="section-card">
+            <h2>Search Photo</h2>
+            
+            <div class="search-input-group">
+                <input type="text" id="searchQuery" placeholder="Show me pictures of cat">
+                <button onclick="searchPhotos()">Search</button>
+            </div>
+            
+            <div id="searchResults">Ready to search.</div>
+        </div>
+
+        <hr>
+
+        <div class="section-card">
+            <h2>Upload Photo</h2>
+            
+            <div class="upload-fields-group">
+                <input type="file" id="photoFile" onchange="fillImageName()">
+                <input type="text" id="photoName" placeholder="image name)">
+                <input type="text" id="photoLabels" placeholder="Labels (comma-separated, optional)">
+                <button onclick="uploadPhoto(event)">Upload</button>
+            </div>
+            
+            <div id="uploadStatus">Upload status: Idle.</div>
+        </div>
+    </div>
+
+    <script src="./apiGateway-js-sdk/apigClient.js"></script>
+    <script>
+        // Create API Gateway client
+        var apigClient = apigClientFactory.newClient();
+
+        // Search photos
+        function searchPhotos() {
+            const query = document.getElementById('searchQuery').value;
+
+            const params = { q: query }; // query string
+            const body = {}; // GET request has empty body
+            const additionalParams = {
+            	headers: {
+                    "X-API-Key": "h5zCL1UM0g5HagkoPW3QS6psO6a03CAiayTUFFtE"
+                }
+            }; 
+
+            apigClient.searchGet(params, body, additionalParams)
+                .then(function(response) {
+                    const results = response.data; // adjust if your Lambda wraps it
+                    const container = document.getElementById('searchResults');
+                    container.innerHTML = '';
+                    results["data"].forEach(obj => {
+                    	var url = obj["url"]
+                        // 1. Create wrapper for fixed size container
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'image-result-wrapper'; 
+                        
+                        // 2. Create the image element
+                        const img = document.createElement('img');
+                        img.src = url;
+                        
+                        // Add class for CSS styling (object-fit: cover)
+                        img.className = 'search-result-image'; 
+                        img.alt = 'Search result image';
+                        
+                        wrapper.appendChild(img);
+                        container.appendChild(wrapper);
+                    });
+                }).catch(function(error) {
+                    console.error(error);
+                    alert("Search failed!");
+                });
+        }
+
+        // Upload photo
+        async function uploadPhoto(event) {
+            event.preventDefault();
+            const file = document.getElementById('photoFile').files[0];
+            const imageName = document.getElementById('photoFile').files[0].name;
+            const labels = document.getElementById('photoLabels').value;
+
+            if (!file || !imageName) {
+                alert("Select a file and set an image name.");
+                return;
+            }
+
+            const params = {
+            	"image-name": imageName,
+            	"x-amz-meta-customLabels": labels
+            };
+            const buffer = await file.arrayBuffer();
+            const body = new Uint8Array(buffer)
+            
+            const additionalParams = {
+                headers: {
+                    "Content-Type": file.type,
+                    "image-name": imageName,
+                    "x-amz-meta-customLabels": labels,
+                    "X-API-Key": "h5zCL1UM0g5HagkoPW3QS6psO6a03CAiayTUFFtE"
+                }
+            };
+            
+            apigClient.uploadPut(params, body, additionalParams)
+                  .then(function(response) {
+                    document.getElementById('uploadStatus').innerText = "Upload successful!";
+                }).catch(function(error) {
+                    console.error(error);
+                    document.getElementById('uploadStatus').innerText = "Upload failed!";
+                });
+
+        }
+        
+        function fillImageName() {
+		const fileInput = document.getElementById('photoFile');
+		const nameInput = document.getElementById('photoName');
+		if (fileInput.files.length > 0) {
+			nameInput.value = fileInput.files[0].name;
+		}
+	}
+	
+    </script>
+</body>
+</html>
+
