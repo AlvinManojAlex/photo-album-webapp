@@ -12,6 +12,11 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
 
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -102,6 +107,13 @@ Resources:
       ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
       PathPart: photos
 
+  ApiGatewayResourcePhotosObject:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      ParentId: !Ref ApiGatewayResourcePhotos
+      PathPart: "{object}"
+
   ApiGatewayResourceSearch:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -154,9 +166,11 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
-      ResourceId: !Ref ApiGatewayResourcePhotos
+      ResourceId: !Ref ApiGatewayResourcePhotosObject
       HttpMethod: PUT
       AuthorizationType: NONE
+      RequestParameters:
+        method.request.path.object: true
       Integration:
         Type: AWS
         IntegrationHttpMethod: PUT
@@ -165,9 +179,7 @@ Resources:
           Fn::Sub:
             arn:aws:apigateway:${AWS::Region}:s3:path/${AWS::StackName}-photos-template/{object}
         RequestParameters:
-          method.request.path.object: true
-      RequestParameters:
-        method.request.path.object: true
+          integration.request.path.object: "method.request.path.object"
 
   
   # PERMISSION TO ALLOW API → LAMBDA
