@@ -9,19 +9,24 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${AWS::StackName}-photo-album-frontend-template"
-      OwnershipControls:
-        Rules:
-          - ObjectOwnership: ObjectWriter
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
-      AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
+        ErrorDocument: index.html
 
-  
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PublicRead
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+
+
   # S3 BUCKET FOR PHOTO STORAGE
   
   PhotoBucket:
@@ -104,6 +109,26 @@ Resources:
       ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
       PathPart: search
 
+  ApiGatewayS3Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewayS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource: !Sub "arn:aws:s3:::${AWS::StackName}-photos-template/*"
   
   # GET /search → Lambda (search-photos)
   
@@ -135,9 +160,14 @@ Resources:
       Integration:
         Type: AWS
         IntegrationHttpMethod: PUT
+        Credentials: !GetAtt ApiGatewayS3Role.Arn
         Uri: 
           Fn::Sub:
             arn:aws:apigateway:${AWS::Region}:s3:path/${AWS::StackName}-photos-template/{object}
+        RequestParameters:
+          method.request.path.object: true
+      RequestParameters:
+        method.request.path.object: true
 
   
   # PERMISSION TO ALLOW API → LAMBDA
