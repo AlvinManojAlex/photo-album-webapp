@@ -40,7 +40,7 @@ Resources:
       BucketName: !Sub "${AWS::StackName}-photos-template"
       NotificationConfiguration:
         LambdaConfigurations:
-          - Event: "s3:ObjectCreated:PUT"
+          - Event: "s3:ObjectCreated:Put"
             Function: !GetAtt IndexPhotosLambda.Arn
 
   # Permission for S3 to invoke Lambda
